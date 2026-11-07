@@ -2,13 +2,13 @@ name: Build Intel macOS App
 on: [workflow_dispatch]
 jobs:
   build:
-    runs-on: macos-15
+    runs-on: macos-26
     steps:
       - uses: actions/checkout@v4
-      - name: Build Universal (Intel + Apple Silicon) App Bundle
+      - name: Build Intel x86_64 App Bundle
         run: |
-          sed -i '' 's/swift build -c release/swift build -c release --arch arm64 --arch x86_64/g' build-app.sh
-          sed -i '' 's|.build/release/Noot|.build/apple/Products/Release/Noot|g' build-app.sh
+          sed -i '' 's/swift build -c release/swift build -c release --arch x86_64/g' build-app.sh
+          sed -i '' 's|.build/release/Noot|.build/x86_64-apple-macosx/release/Noot|g' build-app.sh
           chmod +x build-app.sh
           ./build-app.sh
           cd ~/Applications
