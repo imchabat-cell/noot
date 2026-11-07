@@ -1,11 +1,20 @@
-name: ci
-on:
-  pull_request:
-  push:
-    branches: [main]
+name: Build Intel macOS App
+on: [workflow_dispatch]
 jobs:
   build:
-    runs-on: macos-latest
+    runs-on: macos-15
     steps:
       - uses: actions/checkout@v4
-      - run: swift build -c release
+      - name: Build Universal (Intel + Apple Silicon) App Bundle
+        run: |
+          sed -i '' 's/swift build -c release/swift build -c release --arch arm64 --arch x86_64/g' build-app.sh
+          sed -i '' 's|.build/release/Noot|.build/apple/Products/Release/Noot|g' build-app.sh
+          chmod +x build-app.sh
+          ./build-app.sh
+          cd ~/Applications
+          ditto -c -k --sequesterRsrc --keepParent Noot.app Noot-Intel.zip
+      - name: Upload Compiled Intel App
+        uses: actions/upload-artifact@v4
+        with:
+          name: Noot-Intel-Build
+          path: ~/Applications/Noot-Intel.zip
